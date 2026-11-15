@@ -6,7 +6,6 @@ const tick = () => new Promise((r) => setTimeout(r, 0))
 let agent
 let movement
 let crown
-let position
 
 beforeAll(async () => {
   vi.spyOn(console, "error").mockImplementation(() => {})
@@ -15,7 +14,6 @@ beforeAll(async () => {
   await import("../src/main.js")
   ;({ agent, movement } = window)
   crown = document.querySelector("watch-crown")
-  position = document.querySelector('ui-segmented-control[aria-label="Position"]')
   await tick()
 })
 
@@ -25,7 +23,7 @@ test("an agent can find every control by name", () => {
   const entries = agent.snapshot().filter((e) => !e.offPage)
   for (const e of entries) expect(e.label, `${e.component} ${e.ref} has no name`).toBeTruthy()
   const labels = entries.map((e) => e.label)
-  for (const label of ["Watch", "Crown", "Position", "Dial", "Metal", "Lights out", "Power reserve", "Back to now"]) {
+  for (const label of ["Watch", "Crown"]) {
     expect(labels, `${label} is missing`).toContain(label)
   }
   expect(entries.find((e) => e.label === "Watch").actions).toEqual(
@@ -52,7 +50,7 @@ test("the crown pulls out with Enter and turns with the arrow keys", () => {
   movement.setDate(10)
   key(crown, "Enter")
   expect(movement.crown).toBe("date")
-  expect(position.value).toBe("date")
+  expect(crown.getAttribute("data-crown")).toBe("date")
   key(crown, "ArrowUp")
   key(crown, "ArrowUp")
   expect(movement.day()).toBe(12)
@@ -70,11 +68,18 @@ test("the crown pulls out with Enter and turns with the arrow keys", () => {
   expect(crown.getAttribute("role")).toBe("spinbutton")
 })
 
-test("the Position control and an agent both move the crown", async () => {
-  await agent.act({ steps: [{ ref: "Position", action: "setValue", args: ["time"] }] })
-  expect(movement.crown).toBe("time")
+test("an agent pulls and turns the crown", async () => {
+  movement.reset()
+  const result = await agent.act({
+    steps: [
+      { ref: "Watch", action: "setCrown", args: ["time"] },
+      { ref: "Crown", action: "turn", args: [5] },
+    ],
+  })
+  expect(result.ok).toBe(true)
+  expect(crown.getAttribute("data-crown")).toBe("time")
   await agent.act({ steps: [{ ref: "Watch", action: "setCrown", args: ["wind"] }] })
-  expect(position.value).toBe("wind")
+  expect(crown.getAttribute("data-crown")).toBe("wind")
 })
 
 test("winding fills the reserve and stops at full", () => {

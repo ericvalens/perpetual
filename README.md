@@ -7,24 +7,21 @@ A wristwatch you can play with, built with Web Components and
 synthesized live with Web Audio.
 
 - **Spin it.** Drag the watch; throw it and it keeps turning.
-- **Work the crown.** Tap the crown on the watch (or the one in the panel) to pull it out a stop:
-  **Wind** fills the power reserve, **Date** quicksets the date forward, and **Time** stops the
-  seconds hand (hacking) while you drag the crown up or down to move the hands. Scroll works too.
-- **Lights out.** The room goes dark and the lume takes over.
-- **Dial and metal.** Five dials, three metals, changed live.
+- **Work the crown.** Tap the crown to pull it out a stop: **Wind**, then **Date** (turn it to move
+  the date forward), then **Time**, where the seconds hand stops while you drag the crown up or down
+  to move the hands. Scroll works too. Tap again to push it home.
 
-Built from UI SDK parts: `ui-segmented-control` (crown position, dial, metal), `ui-switch`, `ui-meter` and `ui-button`. The watch and its crown are two custom primitives
-(`src/primitives.js`) made with `definePrimitive`, so they get the same keyboard, focus and
-agent support as the built-in parts. The crown is a spinbutton: Enter pulls it, the arrow keys turn
-it, Home pushes it in.
+The watch and its crown are two UI SDK primitives (`src/primitives.js`) made with
+`definePrimitive`, so they get UI SDK's keyboard, focus and agent support. The crown is a
+spinbutton under the watch: Enter pulls it, the arrow keys turn it, Home pushes it in.
 
-**Agents** can drive it. Everything joins UI SDK's agent bridge, and browsers with WebMCP get
+**Agents** can drive it. Both primitives join UI SDK's agent bridge, and browsers with WebMCP get
 `snapshot` / `query` / `act` tools. From the console:
 
 ```js
 await agent.act({ steps: [
-  { ref: "Dial", action: "setValue", args: ["blue"] },
   { ref: "Watch", action: "setTime", args: ["10:10"] },
+  { ref: "Watch", action: "spin", args: [1] },
 ] })
 ```
 

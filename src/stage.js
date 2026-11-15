@@ -21,6 +21,7 @@ export function createStage(host, movement, { onCrownTap, onCrownTurn } = {}) {
     return null
   }
   renderer.toneMapping = THREE.ACESFilmicToneMapping
+  renderer.toneMappingExposure = 1.12
   renderer.setClearColor(0x000000, 0)
   renderer.domElement.setAttribute("aria-hidden", "true")
   host.appendChild(renderer.domElement)
@@ -82,8 +83,6 @@ export function createStage(host, movement, { onCrownTap, onCrownTurn } = {}) {
   let lastTouch = -1e9
   let crownRot = 0
   let crownRotShown = 0
-  let lights = 1
-  let lightsShown = 1
   let pull = 0
   let clock = 0
 
@@ -168,9 +167,6 @@ export function createStage(host, movement, { onCrownTap, onCrownTurn } = {}) {
       pendingSpin += turns * TAU
       lastTouch = clock
     },
-    setLights(on) {
-      lights = on ? 1 : 0
-    },
     dispose() {
       cancelAnimationFrame(raf)
       ro.disconnect()
@@ -232,18 +228,6 @@ export function createStage(host, movement, { onCrownTap, onCrownTurn } = {}) {
     watch.hour.rotation.z = -(hours / 12) * TAU
     watch.shadows.forEach((s, i) => (s.rotation.z = [watch.hour, watch.minute, watch.second][i].rotation.z))
     watch.setDay(movement.day())
-
-    // lights out: the room goes dark and the lume takes over
-    lightsShown += (lights - lightsShown) * (lights > lightsShown ? 0.06 : 0.045)
-    const lit = lightsShown
-    const dark = 1 - lit
-    renderer.toneMappingExposure = 1.12 * (0.16 + 0.84 * lit)
-    keyLight.intensity = 2.4 * (0.05 + 0.95 * lit)
-    fillLight.intensity = 0.5 * (0.1 + 0.9 * lit)
-    scene.environmentIntensity = 0.07 + 0.93 * lit
-    watch.dialUniforms.uDim.value = dark
-    watch.mats.lume.emissiveIntensity = 0.12 + watch.lume.peak * dark
-    watch.glow.material.opacity = dark * 0.5
 
     renderer.render(scene, camera)
   }
