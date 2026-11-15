@@ -1,0 +1,20 @@
+{
+  "name": "perpetual",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --format=esm --minify --target=es2022 --outfile=public/app.js",
+    "dev": "esbuild src/main.js --bundle --format=esm --sourcemap --outfile=public/app.js --servedir=public --watch=forever --serve=127.0.0.1:4322",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@ui-sdk/core": "^0.1.0-beta.5",
+    "@ui-sdk/web": "^0.1.0-beta.5",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "jsdom": "^29.1.1",
+    "vitest": "^5.1.0"
+  }
+}
